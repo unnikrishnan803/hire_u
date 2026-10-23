@@ -1,0 +1,71 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Interview Question {{ current }}/{{ total }} — HireU{% endblock %}
+
+{% block sn_iv %}active{% endblock %}
+{% block nav_iv %}active{% endblock %}
+{% block dash_layout_class %}no-right-rail{% endblock %}
+{% block right_sidebar %}{% endblock %}
+
+{% block dash_content %}
+<div style="max-width:920px;margin:0 auto;width:100%;">
+  <!-- Header with progress info -->
+  <div class="section-card mb-3">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem;">
+      <div style="display:flex;align-items:center;gap:.6rem;">
+        <span class="pill pill-purple"><i class="bi bi-robot"></i> {{ session.get_mode_display }}</span>
+      </div>
+      <span style="font-size:.85rem;font-weight:600;color:var(--text-secondary);">
+        Question {{ current }} of {{ total }}
+      </span>
+    </div>
+
+    <div class="prog-bar" style="height:8px;">
+      <div class="fill" data-pct="{{ progress }}" style="width:{{ progress }}%;"></div>
+    </div>
+  </div>
+
+  <!-- Question Card -->
+  <div class="section-card p-4 p-md-5 mb-4">
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">
+      <span class="pill pill-blue" style="font-size:.78rem;font-weight:700;">Question #{{ current }}</span>
+    </div>
+
+    <h3 style="font-size:1.35rem;font-weight:700;line-height:1.5;color:var(--text-primary);margin-bottom:1.5rem;">
+      {{ question.question_text }}
+    </h3>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-field mb-4">
+        <label style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Your Response</span>
+          <span style="font-size:.75rem;color:var(--text-muted);font-weight:400;">Be detailed and articulate</span>
+        </label>
+        <textarea name="answer" rows="7" class="form-input"
+                  placeholder="Provide your comprehensive answer here. Where applicable, explain your thought process, trade-offs, and examples..."
+                  style="border-radius:var(--r-md);resize:vertical;line-height:1.6;" required autofocus></textarea>
+      </div>
+
+      <div style="background:var(--primary-light);border:1px solid var(--primary-glow);border-radius:var(--r-md);padding:.9rem 1.1rem;margin-bottom:1.75rem;display:flex;align-items:flex-start;gap:.75rem;">
+        <i class="bi bi-lightbulb-fill" style="color:var(--primary);font-size:1.1rem;margin-top:.1rem;flex-shrink:0;"></i>
+        <div style="font-size:.83rem;color:var(--primary-dark);line-height:1.6;">
+          <strong>Pro Tip:</strong> For behavioral questions, structure your answer using the <strong>STAR</strong> method (Situation, Task, Action, Result). For technical questions, mention edge cases and complexity.
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+        <a href="{% url 'dashboard' %}" class="btn-outline-pro">
+          <i class="bi bi-x-circle me-1"></i>Exit Session
+        </a>
+        <button type="submit" class="btn-primary-pro">
+          {% if current == total %}
+            <span>Complete & View Feedback</span> <i class="bi bi-check-circle ms-1"></i>
+          {% else %}
+            <span>Next Question</span> <i class="bi bi-arrow-right ms-1"></i>
+          {% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

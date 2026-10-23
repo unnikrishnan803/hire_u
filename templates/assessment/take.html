@@ -1,0 +1,117 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}{{ assessment.title }} — HireU{% endblock %}
+
+{% block dash_content %}
+<!-- Header bar -->
+<div class="section-card" style="position:sticky;top:68px;z-index:100;border-radius:var(--r-md);">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <h4 style="margin-bottom:.1rem;">{{ assessment.title }}</h4>
+      <span class="pill pill-blue">{{ assessment.get_type_display }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div style="text-align:right;">
+        <div id="timerDisplay" style="font-size:1.3rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text-primary);">30:00</div>
+        <div style="font-size:.7rem;color:var(--text-muted);">Time Remaining</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:1rem;font-weight:700;color:var(--primary);" id="progressCount">0/{{ total }}</div>
+        <div style="font-size:.7rem;color:var(--text-muted);">Answered</div>
+      </div>
+    </div>
+  </div>
+  <div class="prog-bar mt-2"><div class="fill" id="progressBar" style="width:0%;"></div></div>
+</div>
+
+<form method="POST" id="assessmentForm">
+  {% csrf_token %}
+
+  {% for q in questions %}
+  <div class="section-card question-card" id="qcard-{{ forloop.counter }}" style="{% if not forloop.first %}display:none;{% endif %}">
+    <input type="hidden" name="question_ids" value="{{ q.id }}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+      <span class="pill pill-gray">Question {{ forloop.counter }} of {{ total }}</span>
+      <span class="pill pill-blue">{{ q.section.name }}</span>
+    </div>
+    <h4 style="margin-bottom:1.5rem;line-height:1.5;color:var(--text-primary);">{{ q.text }}</h4>
+
+
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      <label class="option-label" style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:all .15s;">
+        <input type="radio" name="question_{{ q.id }}" value="A" style="width:16px;height:16px;accent-color:var(--primary);" onchange="optionSelected(this)"> A.&nbsp; {{ q.option_a }}
+      </label>
+      <label class="option-label" style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:all .15s;">
+        <input type="radio" name="question_{{ q.id }}" value="B" style="width:16px;height:16px;accent-color:var(--primary);" onchange="optionSelected(this)"> B.&nbsp; {{ q.option_b }}
+      </label>
+      <label class="option-label" style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:all .15s;">
+        <input type="radio" name="question_{{ q.id }}" value="C" style="width:16px;height:16px;accent-color:var(--primary);" onchange="optionSelected(this)"> C.&nbsp; {{ q.option_c }}
+      </label>
+      <label class="option-label" style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:all .15s;">
+        <input type="radio" name="question_{{ q.id }}" value="D" style="width:16px;height:16px;accent-color:var(--primary);" onchange="optionSelected(this)"> D.&nbsp; {{ q.option_d }}
+      </label>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;">
+      {% if not forloop.first %}
+      <button type="button" class="btn-ghost-pro" onclick="navigate(-1)"><i class="bi bi-arrow-left me-1"></i>Back</button>
+      {% else %}
+      <div></div>
+      {% endif %}
+
+      {% if forloop.last %}
+      <button type="submit" class="btn-primary-pro" id="submitBtn">Submit Assessment <i class="bi bi-check-circle ms-1"></i></button>
+      {% else %}
+      <button type="button" class="btn-primary-pro" onclick="navigate(1)">Next <i class="bi bi-arrow-right ms-1"></i></button>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</form>
+
+<style>
+.option-label:hover { border-color:var(--primary); background:var(--primary-light); }
+.option-label:has(input:checked) { border-color:var(--primary); background:var(--primary-light); font-weight:600; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const total = {{ total }};
+let current = 1;
+let answered = {};
+
+function navigate(dir) {
+  document.getElementById('qcard-' + current).style.display = 'none';
+  current += dir;
+  if (current < 1) current = 1;
+  if (current > total) current = total;
+  document.getElementById('qcard-' + current).style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function optionSelected(input) {
+  const match = input.name.match(/question_(\d+)/);
+  if (match) {
+    answered[match[1]] = true;
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  const count = Object.keys(answered).length;
+  document.getElementById('progressCount').textContent = count + '/' + total;
+  document.getElementById('progressBar').style.width = Math.round(count/total*100) + '%';
+}
+
+// Countdown timer
+let secs = 30 * 60;
+const timer = setInterval(() => {
+  secs--;
+  if (secs <= 0) { clearInterval(timer); document.getElementById('assessmentForm').submit(); return; }
+  const m = Math.floor(secs/60), s = secs%60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  if (secs < 300) el.style.color = '#CC1016';
+}, 1000);
+</script>
+{% endblock %}

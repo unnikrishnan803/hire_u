@@ -1,0 +1,524 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HireU — AI-Powered Placement Preparation</title>
+  <meta name="description" content="HireU is an AI-powered adaptive placement preparation platform for college students. Know where you are, know what you need.">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}?v=clean_ui_v7" rel="stylesheet">
+  <style>
+    .lp-nav-links { display:flex; align-items:center; gap:.25rem; margin-left:auto; }
+    .hero-btn-row { display:flex; gap:.75rem; flex-wrap:wrap; }
+    @media(max-width:960px){ .hero-btn-row { justify-content:center; } }
+    .company-logos { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; margin-top:1rem; }
+    @media(max-width:960px){ .company-logos { justify-content:center; } }
+    .company-logo-badge { font-size:.75rem; font-weight:700; color:var(--text-secondary); letter-spacing:.06em; text-transform:uppercase; border:1px solid var(--border); border-radius:var(--r-sm); padding:.3rem .75rem; background:#FFFFFF; transition:all var(--t); }
+    .company-logo-badge:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+    .trusted-label { font-size:.76rem; color:var(--text-muted); margin-bottom:.5rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+    .section-center { text-align:center; margin-bottom:1.25rem; }
+    /* Counter animation */
+    .count-up { display:inline-block; }
+    /* Landing nav hamburger */
+    .lp-hamburger { display:none; background:none; border:1px solid var(--border); border-radius:var(--r-sm); width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; color:var(--text-secondary); font-size:1.1rem; margin-left:auto; transition:all var(--t); }
+    .lp-hamburger:hover { background:var(--bg-hover); color:var(--text-primary); }
+    @media(max-width:768px){
+      .lp-hamburger { display:flex; }
+      .lp-nav-links { display:none !important; }
+    }
+    .lp-mobile-menu { display:none; position:fixed; top:70px; left:0; right:0; background:rgba(255,255,255,.98); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:1rem; z-index:999; flex-direction:column; gap:.25rem; box-shadow:0 8px 24px rgba(15,23,42,.12); animation:slideDown .2s ease; }
+    .lp-mobile-menu.open { display:flex; }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav class="lp-nav" id="lpNav">
+  <div class="lp-nav-inner">
+    <a href="/" class="topnav-brand" style="text-decoration:none;display:flex;align-items:center;">
+      <img src="{% static 'images/logo_new.png' %}" alt="HireU" style="height:38px;width:auto;object-fit:contain;display:block;">
+    </a>
+    <div class="lp-nav-links" style="display:flex;align-items:center;gap:.5rem;">
+      <a href="#how-it-works" class="btn-ghost-pro" style="font-size:.875rem;font-weight:500;">How It Works</a>
+      <a href="#features"     class="btn-ghost-pro" style="font-size:.875rem;font-weight:500;">Features</a>
+      <a href="{% url 'login' %}"    class="btn-ghost-pro" style="font-size:.875rem;font-weight:500;">Sign In</a>
+      <a href="{% url 'register' %}" class="btn-primary-pro btn-sm" style="padding:.5rem 1.25rem;font-size:.85rem;">Get Started Free</a>
+    </div>
+    <button class="lp-hamburger" id="lpHamburgerBtn" aria-label="Open menu" aria-expanded="false">
+      <i class="bi bi-list" id="lpHamburgerIcon"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu drawer -->
+<div class="lp-mobile-menu" id="lpMobileMenu">
+  <a href="#how-it-works" class="topnav-link"><i class="bi bi-map"></i>How It Works</a>
+  <a href="#features"     class="topnav-link"><i class="bi bi-grid-3x3-gap"></i>Features</a>
+  <a href="{% url 'login' %}"    class="topnav-link"><i class="bi bi-box-arrow-in-right"></i>Sign In</a>
+  <hr style="margin:.25rem 0;border-color:var(--border);">
+  <a href="{% url 'register' %}" class="btn-primary-pro btn-sm" style="justify-content:center;"><i class="bi bi-rocket-takeoff-fill"></i>Get Started Free</a>
+</div>
+
+<!-- ── Hero ── -->
+<section class="lp-hero">
+  <div class="lp-hero-inner">
+    <div>
+      <div class="lp-section-eyebrow"><i class="bi bi-stars"></i> AI-Powered Placement Preparation</div>
+      <h1>Your Career Path,<br><em>Personalized</em> For You</h1>
+      <p>HireU analyses your skills, identifies your gaps, generates a personalized daily training plan, and connects you with the right opportunities — all based on your department, target companies, and readiness level.</p>
+      <div class="hero-btn-row">
+        <a href="{% url 'register' %}" class="btn-primary-pro btn-lg"><i class="bi bi-rocket-takeoff-fill"></i>Start Your Journey</a>
+        <a href="#how-it-works"        class="btn-outline-pro btn-lg"><i class="bi bi-play-circle"></i>See How It Works</a>
+      </div>
+      <div class="lp-hero-badges">
+        <span class="lp-hero-badge"><i class="bi bi-check-circle-fill"></i>Free for students</span>
+        <span class="lp-hero-badge"><i class="bi bi-check-circle-fill"></i>No credit card</span>
+        <span class="lp-hero-badge"><i class="bi bi-check-circle-fill"></i>Instant Skill Passport</span>
+      </div>
+      <div class="trusted-label mt-3">Trusted by students from:</div>
+      <div class="company-logos">
+        <span class="company-logo-badge">IIT Madras</span>
+        <span class="company-logo-badge">VIT Vellore</span>
+        <span class="company-logo-badge">NIT Trichy</span>
+        <span class="company-logo-badge">BITS Pilani</span>
+      </div>
+    </div>
+    <div>
+      <!-- CSS Dashboard Illustration (no image needed) -->
+      <div class="lp-hero-visual">
+        <div class="hero-dash-illustration">
+          <div class="hero-dash-topbar">
+            <div class="hero-dash-dot red"></div>
+            <div class="hero-dash-dot yell"></div>
+            <div class="hero-dash-dot green"></div>
+            <div class="hero-dash-bar"></div>
+          </div>
+          <div class="hero-stat-row">
+            <div class="hero-stat-mini">
+              <div class="val">82%</div>
+              <div class="lbl">Readiness</div>
+            </div>
+            <div class="hero-stat-mini">
+              <div class="val">1.2k</div>
+              <div class="lbl">XP Points</div>
+            </div>
+            <div class="hero-stat-mini">
+              <div class="val">14d</div>
+              <div class="lbl">Streak 🔥</div>
+            </div>
+          </div>
+          <div class="hero-progress-card">
+            <div class="hero-progress-title">Skill Passport Progress</div>
+            <div class="hero-prog-item">
+              <div class="hero-prog-label"><span>DSA</span><span>78%</span></div>
+              <div class="hero-prog-bar"><div class="hero-prog-fill" style="width:78%"></div></div>
+            </div>
+            <div class="hero-prog-item">
+              <div class="hero-prog-label"><span>Aptitude</span><span>85%</span></div>
+              <div class="hero-prog-bar"><div class="hero-prog-fill" style="width:85%"></div></div>
+            </div>
+            <div class="hero-prog-item">
+              <div class="hero-prog-label"><span>SQL</span><span>62%</span></div>
+              <div class="hero-prog-bar"><div class="hero-prog-fill" style="width:62%"></div></div>
+            </div>
+            <div class="hero-prog-item" style="margin-bottom:0">
+              <div class="hero-prog-label"><span>Communication</span><span>70%</span></div>
+              <div class="hero-prog-bar"><div class="hero-prog-fill" style="width:70%"></div></div>
+            </div>
+          </div>
+          <div class="hero-badge-row">
+            <span class="hero-badge-chip"><i class="bi bi-buildings"></i> TCS Ready</span>
+            <span class="hero-badge-chip green"><i class="bi bi-check-circle-fill"></i> Infosys Ready</span>
+            <span class="hero-badge-chip orange"><i class="bi bi-clock"></i> Amazon — 78%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats ── -->
+<div class="lp-stats">
+  <div class="lp-stats-inner">
+    <div>
+      <div class="lp-stat-num"><span class="count-up" data-target="10000">0</span>+</div>
+      <div class="lp-stat-label">Students Prepared</div>
+    </div>
+    <div>
+      <div class="lp-stat-num"><span class="count-up" data-target="200">0</span>+</div>
+      <div class="lp-stat-label">Companies Partnered</div>
+    </div>
+    <div>
+      <div class="lp-stat-num"><span class="count-up" data-target="85">0</span>%</div>
+      <div class="lp-stat-label">Placement Rate</div>
+    </div>
+    <div>
+      <div class="lp-stat-num"><span class="count-up" data-target="50">0</span>+</div>
+      <div class="lp-stat-label">Colleges Onboarded</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── How It Works ── -->
+<section class="lp-section fade-up" id="how-it-works" style="background:#F8FAFC;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="lp-section-inner">
+    <div class="section-center">
+      <div class="lp-section-eyebrow"><i class="bi bi-map"></i>The Process</div>
+    </div>
+    <h2 class="lp-section-title">How HireU Works</h2>
+    <p class="lp-section-sub">A continuous loop — Assess → Understand → Train → Measure → Match → Place.</p>
+    <div class="flow-steps stagger-children">
+      <div class="flow-step">
+        <div class="flow-circle"><i class="bi bi-person-plus"></i></div>
+        <div class="flow-step-label">Register &amp; Profile</div>
+      </div>
+      <div class="flow-connector">›</div>
+      <div class="flow-step">
+        <div class="flow-circle"><i class="bi bi-clipboard-data"></i></div>
+        <div class="flow-step-label">3 Initial Assessments</div>
+      </div>
+      <div class="flow-connector">›</div>
+      <div class="flow-step">
+        <div class="flow-circle"><i class="bi bi-journal-bookmark-fill"></i></div>
+        <div class="flow-step-label">Skill Passport</div>
+      </div>
+      <div class="flow-connector">›</div>
+      <div class="flow-step">
+        <div class="flow-circle"><i class="bi bi-calendar-check"></i></div>
+        <div class="flow-step-label">Daily Adaptive Plan</div>
+      </div>
+      <div class="flow-connector">›</div>
+      <div class="flow-step">
+        <div class="flow-circle"><i class="bi bi-graph-up-arrow"></i></div>
+        <div class="flow-step-label">Readiness Score</div>
+      </div>
+      <div class="flow-connector">›</div>
+      <div class="flow-step">
+        <div class="flow-circle"><i class="bi bi-briefcase-fill"></i></div>
+        <div class="flow-step-label">Matched Opportunities</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ── -->
+<section class="lp-section fade-up" id="features">
+  <div class="lp-section-inner">
+    <div class="section-center">
+      <div class="lp-section-eyebrow"><i class="bi bi-grid-3x3-gap"></i>Platform Features</div>
+    </div>
+    <h2 class="lp-section-title">Everything You Need to Get Placed</h2>
+    <p class="lp-section-sub">One platform. Every tool. Personalized for your exact situation.</p>
+    <div class="feature-grid stagger-children">
+      <div class="feature-item">
+        <div class="feature-icon-box"><i class="bi bi-journal-bookmark-fill"></i></div>
+        <h4>Skill Passport</h4>
+        <p>Individual mastery levels for Aptitude, DSA, SQL, Communication, and Interview skills — not a single average score.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-box"><i class="bi bi-robot"></i></div>
+        <h4>Adaptive Daily Training</h4>
+        <p>Your personalized plan changes every day based on weak areas, company requirements, and recent performance.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-box"><i class="bi bi-buildings"></i></div>
+        <h4>Target Company Readiness</h4>
+        <p>Know exactly how prepared you are for TCS, Amazon, Infosys — with skill-gap analysis per company.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-box"><i class="bi bi-person-check-fill"></i></div>
+        <h4>AI Mock Interview</h4>
+        <p>Evaluated using a 5-point rubric — Technical, Relevance, Explanation, Communication, Completeness.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-box"><i class="bi bi-file-earmark-person-fill"></i></div>
+        <h4>Resume AI Checker</h4>
+        <p>Get an ATS-style score, discover missing keywords, and receive actionable improvement suggestions.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-box"><i class="bi bi-graph-up-arrow"></i></div>
+        <h4>Placement Officer Dashboard</h4>
+        <p>College-wide analytics: readiness by department, at-risk students, recruitment drives, candidate matching.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Dashboard Preview (CSS Illustration) ── -->
+<section class="lp-section fade-up" style="background:#F8FAFC;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="lp-section-inner">
+    <div class="section-center">
+      <div class="lp-section-eyebrow"><i class="bi bi-display"></i>Product Preview</div>
+    </div>
+    <h2 class="lp-section-title">A Dashboard That Knows You</h2>
+    <p class="lp-section-sub">Not a generic job board. A personalized platform that adapts to your specific skills, department, and goals.</p>
+    <!-- Premium CSS mock instead of a photo -->
+    <div style="max-width:880px;margin:0 auto;border-radius:var(--r-2xl);overflow:hidden;box-shadow:0 24px 60px -12px rgba(79,70,229,0.18),0 0 0 1px rgba(79,70,229,0.1);">
+      <!-- Mock browser chrome -->
+      <div style="background:#F1F5F9;padding:.6rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);">
+        <div style="width:10px;height:10px;border-radius:50%;background:#FC5B5B;"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:#FDC135;"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:#33C660;"></div>
+        <div style="flex:1;background:#FFFFFF;border-radius:50px;height:24px;margin:0 .75rem;border:1px solid var(--border);display:flex;align-items:center;padding:0 .75rem;">
+          <span style="font-size:.7rem;color:var(--text-muted);">🔒 app.hireu.io/dashboard</span>
+        </div>
+      </div>
+      <!-- Mock dashboard body -->
+      <div style="background:#F8FAFC;padding:1.5rem;display:grid;grid-template-columns:200px 1fr;gap:1rem;min-height:340px;">
+        <!-- Sidebar -->
+        <div style="background:#FFFFFF;border-radius:var(--r-lg);border:1px solid var(--border);padding:.75rem;display:flex;flex-direction:column;gap:.4rem;">
+          <div style="font-size:.6rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;padding:0 .5rem;">Navigation</div>
+          <div style="padding:.5rem .75rem;border-radius:8px;font-size:.72rem;font-weight:600;background:var(--primary-light);color:var(--primary);border-left:3px solid var(--primary);">Dashboard</div>
+          <div style="padding:.5rem .75rem;border-radius:8px;font-size:.72rem;font-weight:600;color:var(--text-secondary);">Profile</div>
+          <div style="padding:.5rem .75rem;border-radius:8px;font-size:.72rem;font-weight:600;color:var(--text-secondary);">Skill Passport</div>
+          <div style="padding:.5rem .75rem;border-radius:8px;font-size:.72rem;font-weight:600;color:var(--text-secondary);">Assessments</div>
+          <div style="margin:.4rem 0;border-top:1px solid var(--border);"></div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;padding:0 .5rem;">Career</div>
+          <div style="padding:.5rem .75rem;border-radius:8px;font-size:.72rem;font-weight:600;color:var(--text-secondary);">Career Roadmap</div>
+          <div style="padding:.5rem .75rem;border-radius:8px;font-size:.72rem;font-weight:600;color:var(--text-secondary);">Opportunities</div>
+        </div>
+        <!-- Main content -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;">
+            <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+              <div style="font-size:1.6rem;font-weight:800;color:var(--primary);">82%</div>
+              <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;">Placement Readiness</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+              <div style="font-size:1.6rem;font-weight:800;color:var(--green);">1,240</div>
+              <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;">XP Points Earned</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+              <div style="font-size:1.6rem;font-weight:800;color:var(--orange);">14 <span class="pulse-fire">🔥</span></div>
+              <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;">Day Streak</div>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:var(--r-md);padding:1.25rem;flex:1;">
+            <div style="font-size:.8rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;">Skill Passport</div>
+            <div style="margin-bottom:.75rem;">
+              <div style="display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">
+                <span>DSA</span><span>78%</span>
+              </div>
+              <div style="height:6px;background:#E2E8F0;border-radius:50px;overflow:hidden;">
+                <div style="height:100%;width:78%;background:var(--gradient);border-radius:50px;"></div>
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem;">
+              <div style="display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">
+                <span>Aptitude</span><span>85%</span>
+              </div>
+              <div style="height:6px;background:#E2E8F0;border-radius:50px;overflow:hidden;">
+                <div style="height:100%;width:85%;background:var(--gradient);border-radius:50px;"></div>
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem;">
+              <div style="display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">
+                <span>SQL</span><span>62%</span>
+              </div>
+              <div style="height:6px;background:#E2E8F0;border-radius:50px;overflow:hidden;">
+                <div style="height:100%;width:62%;background:var(--gradient);border-radius:50px;"></div>
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem;">
+              <div style="display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">
+                <span>Communication</span><span>70%</span>
+              </div>
+              <div style="height:6px;background:#E2E8F0;border-radius:50px;overflow:hidden;">
+                <div style="height:100%;width:70%;background:var(--gradient);border-radius:50px;"></div>
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem;">
+              <div style="display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">
+                <span>Interview</span><span>75%</span>
+              </div>
+              <div style="height:6px;background:#E2E8F0;border-radius:50px;overflow:hidden;">
+                <div style="height:100%;width:75%;background:var(--gradient);border-radius:50px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Testimonials ── -->
+<section class="lp-section fade-up">
+  <div class="lp-section-inner">
+    <div class="section-center">
+      <div class="lp-section-eyebrow"><i class="bi bi-chat-quote"></i>Student Stories</div>
+    </div>
+    <h2 class="lp-section-title">Loved by Students Across India</h2>
+    <p class="lp-section-sub">Real results from real students who prepared smarter with HireU.</p>
+    <div class="testimonial-grid stagger-children">
+      <div class="testimonial-card">
+        <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-text">HireU's adaptive plan helped me go from 45% readiness to 88% in just 6 weeks. Got placed at Infosys on day 1 of campus recruitment!</div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div class="testimonial-avatar">AK</div>
+          <div>
+            <div class="testimonial-name">Arjun Kumar</div>
+            <div class="testimonial-role">CSE · Placed at Infosys</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-text">The AI Mock Interview feature was a game-changer. It gave me detailed feedback on my answers and helped me fix my weak spots before the real interview.</div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div class="testimonial-avatar">PR</div>
+          <div>
+            <div class="testimonial-name">Priya Rajan</div>
+            <div class="testimonial-role">Data Science · Placed at TCS</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></div>
+        <div class="testimonial-quote">"</div>
+        <div class="testimonial-text">The skill passport gave me clarity on exactly where I stood. No more guessing — I knew which topics needed work and could focus my energy precisely.</div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div class="testimonial-avatar">SM</div>
+          <div>
+            <div class="testimonial-name">Sneha Mehta</div>
+            <div class="testimonial-role">ECE · Placed at Amazon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="lp-cta-section fade-up">
+  <div class="lp-cta-card">
+    <div class="lp-cta-content">
+      <div class="lp-section-eyebrow"><i class="bi bi-rocket-takeoff-fill"></i>Start Today — 100% Free</div>
+      <h2 class="lp-cta-title">Ready to Take Control of Your<br>Placement Journey?</h2>
+      <p class="lp-cta-sub">Join thousands of students already using HireU to prepare smarter, track company readiness, and get placed faster.</p>
+      <div class="lp-cta-buttons">
+        <a href="{% url 'register' %}" class="btn-primary-pro btn-lg"><i class="bi bi-rocket-takeoff-fill"></i>Create Free Account</a>
+        <a href="{% url 'login' %}" class="btn-outline-pro btn-lg">Sign In to Dashboard <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="lp-cta-perks">
+        <span><i class="bi bi-check-circle-fill"></i> No credit card required</span>
+        <span><i class="bi bi-check-circle-fill"></i> Instant Skill Passport</span>
+        <span><i class="bi bi-check-circle-fill"></i> Takes less than 2 minutes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="lp-footer">
+  <div class="lp-footer-inner">
+    <div class="lp-footer-grid">
+      <div>
+    <img src="{% static 'images/logo_new.png' %}" alt="HireU" style="height:32px;margin-bottom:.75rem;object-fit:contain;display:block;">
+        <p style="font-size:.83rem;color:var(--text-secondary);line-height:1.7;max-width:240px;margin:0;">AI-powered adaptive placement preparation for college students across India.</p>
+      </div>
+      <div>
+        <h6>Platform</h6>
+        <a href="{% url 'assessments' %}">Assessments</a>
+        <a href="{% url 'skill_passport' %}">Skill Passport</a>
+        <a href="{% url 'opportunity_hub' %}">Opportunities</a>
+        <a href="{% url 'mock_interview' %}">Mock Interview</a>
+      </div>
+      <div>
+        <h6>Resources</h6>
+        <a href="#">Blog</a>
+        <a href="#">FAQ</a>
+        <a href="#">Documentation</a>
+      </div>
+      <div>
+        <h6>Company</h6>
+        <a href="#">About</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <p class="lp-footer-copy">&copy; 2026 HireU. All rights reserved. Readiness scores are internal preparation indicators only — not placement guarantees.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Animated counter
+function animateCounters() {
+  document.querySelectorAll('.count-up').forEach(el => {
+    const target = parseInt(el.dataset.target, 10);
+    const duration = 1800;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = Math.floor(current).toLocaleString();
+    }, 16);
+  });
+}
+
+// Fade-up and stagger on scroll
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up, .stagger-children').forEach(el => fadeObserver.observe(el));
+
+// Counter trigger
+const statsEl = document.querySelector('.lp-stats');
+let counted = false;
+const counterObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting && !counted) { counted = true; animateCounters(); }
+}, { threshold: 0.5 });
+if (statsEl) counterObserver.observe(statsEl);
+
+// Nav scroll effect
+const lpNav = document.getElementById('lpNav');
+window.addEventListener('scroll', () => {
+  if (lpNav) {
+    const scrolled = window.scrollY > 40;
+    lpNav.style.background = scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.92)';
+    lpNav.style.boxShadow = scrolled ? '0 4px 24px rgba(15,23,42,0.09)' : '0 1px 3px rgba(15,23,42,0.04)';
+  }
+}, { passive: true });
+
+// Mobile hamburger
+const lpHamburgerBtn = document.getElementById('lpHamburgerBtn');
+const lpMobileMenu = document.getElementById('lpMobileMenu');
+const lpHamburgerIcon = document.getElementById('lpHamburgerIcon');
+
+if (lpHamburgerBtn) {
+  lpHamburgerBtn.addEventListener('click', () => {
+    const isOpen = lpMobileMenu.classList.toggle('open');
+    lpHamburgerBtn.setAttribute('aria-expanded', isOpen);
+    lpHamburgerIcon.className = isOpen ? 'bi bi-x-lg' : 'bi bi-list';
+  });
+
+  // Close on link click
+  lpMobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      lpMobileMenu.classList.remove('open');
+      lpHamburgerIcon.className = 'bi bi-list';
+      lpHamburgerBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!lpNav.contains(e.target) && !lpMobileMenu.contains(e.target)) {
+      lpMobileMenu.classList.remove('open');
+      lpHamburgerIcon.className = 'bi bi-list';
+      lpHamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+</script>
+</body>
+</html>

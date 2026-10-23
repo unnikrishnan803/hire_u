@@ -1,0 +1,224 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Dashboard — HireU{% endblock %}
+{% block sn_dash %}active{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block dash_content %}
+{% with profile=request.user.student_profile gami=request.user.student_profile.gamification %}
+
+<!-- Greeting -->
+<div class="section-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <div>
+      <h3 style="margin-bottom:.2rem;">Good {{ greeting }}, {{ request.user.first_name|default:request.user.username }} 👋</h3>
+      <p style="color:var(--text-secondary);font-size:.875rem;margin:0;">
+        {{ today_date }} ·
+        {% if today_completed == today_total and today_total > 0 %}
+          <span style="color:var(--green);font-weight:600;"><i class="bi bi-check-circle-fill me-1"></i>All tasks done!</span>
+        {% else %}
+          <span>{{ today_completed }} of {{ today_total }} tasks completed today</span>
+        {% endif %}
+      </p>
+    </div>
+    <div style="display:flex;gap:.5rem;">
+      <span class="pill pill-yellow"><i class="bi bi-fire"></i>{{ gami.streak|default:"0" }}d streak</span>
+      <span class="pill pill-blue"><i class="bi bi-star-fill"></i>{{ gami.xp|default:"0" }} XP</span>
+    </div>
+  </div>
+</div>
+
+<!-- 4-Stat Row -->
+<div class="stat-row">
+  <div class="stat-item">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div class="stat-val blue">{{ profile.overall_readiness }}%</div>
+        <div class="stat-desc">Overall Readiness</div>
+      </div>
+      <div class="score-ring" style="width:64px;height:64px;">
+        <svg width="64" height="64" viewBox="0 0 96 96">
+          <circle class="track" cx="48" cy="48" r="40"/>
+          <circle class="arc" cx="48" cy="48" r="40" data-pct="{{ profile.overall_readiness }}"
+                  stroke="var(--primary)" />
+        </svg>
+        <div class="inner-text"><span class="num" style="font-size:.9rem;">{{ profile.overall_readiness }}%</span></div>
+      </div>
+    </div>
+    <div class="stat-change up mt-2"><i class="bi bi-arrow-up-short"></i> Internal indicator only</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-val green">{{ today_completed }}/{{ today_total }}</div>
+    <div class="stat-desc">Tasks Today</div>
+    <div class="prog-bar mt-2">
+      <div class="fill green" data-pct="{{ today_pct }}"></div>
+    </div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-val orange">{{ gami.streak|default:"0" }}</div>
+    <div class="stat-desc">Day Streak 🔥</div>
+    <div class="stat-change up mt-2" style="font-size:.72rem;">Keep going!</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-val purple">{{ gami.xp|default:"0" }}</div>
+    <div class="stat-desc">Total XP ⭐</div>
+    <div class="stat-change mt-2" style="font-size:.72rem;color:var(--text-muted);">{{ request.user.student_profile.cgpa|default:"—" }} CGPA</div>
+  </div>
+</div>
+
+<!-- Today's Adaptive Plan -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Today's Adaptive Plan</span>
+    <span class="section-action" onclick="regenerateTasks()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</span>
+  </div>
+
+  {% if tasks %}
+    {% for task in tasks %}
+    <div class="task-item {% if task.status == 'COMPLETED' %}done{% endif %}" id="task-{{ task.id }}">
+      <div class="task-check {% if task.status == 'COMPLETED' %}checked{% endif %}"
+           onclick="markTask({{ task.id }}, this)">
+        {% if task.status == 'COMPLETED' %}<i class="bi bi-check"></i>{% endif %}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-label">{{ task.title }}</div>
+        <div class="task-meta">
+          <span class="pill {% if task.difficulty == 'EASY' %}pill-green{% elif task.difficulty == 'MEDIUM' %}pill-yellow{% else %}pill-orange{% endif %}" style="font-size:.65rem;">{{ task.difficulty }}</span>
+          <span class="ms-2">{{ task.skill_area }}</span> ·
+          <span>{{ task.estimated_minutes }} min</span> ·
+          <span class="pill pill-blue" style="font-size:.65rem;">+{{ task.xp_reward }} XP</span>
+        </div>
+      </div>
+      {% if task.status != 'COMPLETED' %}
+      <button class="btn-primary-pro btn-sm" onclick="markTask({{ task.id }}, document.querySelector('#task-{{ task.id }} .task-check'))">Start</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-pro">
+      <i class="bi bi-calendar-x"></i>
+      <p>No tasks yet. Complete your initial assessments to generate a personalized plan.</p>
+      <a href="{% url 'assessments' %}" class="btn-primary-pro btn-sm mt-2">Take Assessments</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Skill Gap Analysis -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Skill Gap Analysis</span>
+    <a href="{% url 'skill_passport' %}" class="section-action">View Passport</a>
+  </div>
+  <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:.9rem;">
+    Target: <strong style="color:var(--text-primary);">{{ profile.career_goal|default:"Not set" }}</strong>
+    · Dept: <strong style="color:var(--text-primary);">{{ profile.department.name|default:"—" }}</strong>
+  </p>
+  {% if weak_skills %}
+    {% for ws in weak_skills %}
+    <div class="skill-item">
+      <div class="skill-header">
+        <span class="skill-name">{{ ws.skill.name }}</span>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <span class="skill-pct">{{ ws.mastery_percentage }}%</span>
+          <span class="pill
+            {% if ws.level == 'ADVANCED' %}pill-green
+            {% elif ws.level == 'NORMAL' %}pill-yellow
+            {% else %}pill-orange{% endif %}">{{ ws.level }}</span>
+        </div>
+      </div>
+      <div class="prog-bar">
+        <div class="fill
+          {% if ws.mastery_percentage >= 75 %}green
+          {% elif ws.mastery_percentage >= 45 %}orange
+          {% else %}red{% endif %}"
+             data-pct="{{ ws.mastery_percentage }}"></div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--text-muted);font-size:.83rem;">Complete assessments to see your skill breakdown.</p>
+  {% endif %}
+</div>
+
+<!-- Target Companies -->
+{% if companies %}
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Target Company Readiness</span>
+    <span style="font-size:.72rem;color:var(--text-muted);">Internal indicator only</span>
+  </div>
+  {% for comp in companies %}
+  <div class="company-item">
+    <div class="company-logo">{{ comp.name|slice:":2"|upper }}</div>
+    <div style="flex:1;min-width:0;">
+      <div class="company-name">{{ comp.name }}</div>
+      <div class="prog-bar mt-1" style="height:5px;">
+        <div class="fill {% if comp.readiness >= 80 %}green{% elif comp.readiness >= 55 %}orange{% else %}red{% endif %}"
+             data-pct="{{ comp.readiness }}"></div>
+      </div>
+    </div>
+    <span class="pill
+      {% if comp.readiness >= 80 %}pill-green
+      {% elif comp.readiness >= 55 %}pill-yellow
+      {% else %}pill-orange{% endif %}">{{ comp.readiness }}%</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Assessments Status -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Initial Assessments</span>
+    <a href="{% url 'assessments' %}" class="section-action">View All</a>
+  </div>
+  {% for a in all_assessments %}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border);" class="{% if forloop.last %}border-bottom-0{% endif %}">
+    <div>
+      <div style="font-size:.875rem;font-weight:600;">{{ a.title }}</div>
+      <div style="font-size:.75rem;color:var(--text-muted);">{{ a.get_type_display }}</div>
+    </div>
+    {% if a.id in completed_ids %}
+      <span class="pill pill-green"><i class="bi bi-check-circle"></i>Done</span>
+    {% else %}
+      <a href="{% url 'take_assessment' a.id %}" class="btn-primary-pro btn-sm">Take Now</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endwith %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function markTask(taskId, checkEl) {
+  const card = document.getElementById('task-' + taskId);
+  if (card.classList.contains('done')) return;
+
+  fetch(`/assessment/task/${taskId}/complete/`, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'ok') {
+      card.classList.add('done');
+      checkEl.classList.add('checked');
+      checkEl.innerHTML = '<i class="bi bi-check"></i>';
+      const btn = card.querySelector('.btn-primary-pro');
+      if (btn) btn.remove();
+
+      // XP toast
+      const toast = document.createElement('div');
+      toast.className = 'toast-pro';
+      toast.innerHTML = `<i class="bi bi-star-fill" style="color:#FFD600;"></i> +${data.xp} XP earned!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+  });
+}
+</script>
+{% endblock %}

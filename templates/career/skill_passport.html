@@ -1,0 +1,156 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Skill Passport — HireU{% endblock %}
+{% block sn_passport %}active{% endblock %}
+
+{% block dash_content %}
+{% with profile=request.user.student_profile %}
+
+<!-- Profile Header -->
+<div class="section-card" style="background:var(--navy);border-color:var(--navy);">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--primary);border:3px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:white;flex-shrink:0;">
+        {{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}
+      </div>
+      <div>
+        <h3 style="color:white;margin-bottom:.2rem;">{{ request.user.get_full_name|default:request.user.username }}</h3>
+        <div style="color:rgba(255,255,255,.6);font-size:.85rem;">
+          {{ profile.department.name|default:"—" }} · Year {{ profile.year|default:"—" }} · CGPA {{ profile.cgpa|default:"—" }}
+        </div>
+        <div style="color:#60A5FA;font-weight:600;font-size:.875rem;margin-top:.2rem;">
+          Target: {{ profile.career_goal|default:"Not set" }}
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:2.5rem;font-weight:800;color:white;line-height:1;">{{ profile.overall_readiness }}%</div>
+      <div style="color:rgba(255,255,255,.55);font-size:.78rem;">Overall Readiness</div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.2rem;">Internal indicator only</div>
+    </div>
+  </div>
+</div>
+
+<!-- Verified Skills Grid -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Verified Skills</span>
+    <a href="{% url 'assessments' %}" class="section-action">Take Assessment</a>
+  </div>
+
+  {% if skills %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem;">
+      {% for sp in skills %}
+      <div class="card-pro card-pro-hover" style="padding:1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem;">
+          <div>
+            <div style="font-weight:700;font-size:.9rem;">{{ sp.skill.name }}</div>
+            <div style="font-size:.75rem;color:var(--text-muted);">Last updated {{ sp.last_updated|date:"M d" }}</div>
+          </div>
+          <span class="pill
+            {% if sp.level == 'ADVANCED' %}pill-green
+            {% elif sp.level == 'NORMAL' %}pill-yellow
+            {% else %}pill-orange{% endif %}">{{ sp.get_level_display }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
+          <span style="font-size:.78rem;color:var(--text-secondary);">Mastery</span>
+          <span style="font-size:.78rem;font-weight:700;">{{ sp.mastery_percentage }}%</span>
+        </div>
+        <div class="prog-bar">
+          <div class="fill
+            {% if sp.mastery_percentage >= 75 %}green
+            {% elif sp.mastery_percentage >= 45 %}orange
+            {% else %}red{% endif %}"
+               data-pct="{{ sp.mastery_percentage }}"></div>
+        </div>
+        <div style="font-size:.72rem;margin-top:.5rem;
+          {% if sp.trend == 'Improving' %}color:var(--green);{% elif sp.trend == 'Declining' %}color:var(--red);{% else %}color:var(--text-muted);{% endif %}">
+          {% if sp.trend == 'Improving' %}<i class="bi bi-arrow-up-short"></i>
+          {% elif sp.trend == 'Declining' %}<i class="bi bi-arrow-down-short"></i>
+          {% else %}<i class="bi bi-dash"></i>{% endif %}
+          {{ sp.trend }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-pro">
+      <i class="bi bi-journal-x"></i>
+      <p>No skills recorded yet. Complete your initial assessments to build your Skill Passport.</p>
+      <a href="{% url 'assessments' %}" class="btn-primary-pro btn-sm mt-2">Start Assessments</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Skill Gap Box -->
+<div class="section-card" style="border-left:4px solid var(--primary);">
+  <div class="section-header">
+    <span class="section-title">Rule-Based Skill Gap Analysis vs Target Role</span>
+    <a href="{% url 'career_roadmap' %}" class="section-action">View Learning Roadmap</a>
+  </div>
+  <p style="font-size:.83rem;color:var(--text-secondary);margin-bottom:1rem;">
+    Target Role: <strong>{{ target_role }}</strong> · Benchmarked against campus drive recruitment requirements.
+  </p>
+
+  <div style="display:flex;flex-direction:column;gap:.75rem;">
+    {% if high_priority_gaps %}
+    <div style="padding:.75rem 1rem;background:var(--red-bg);border-radius:var(--r-md);border-left:3px solid var(--red);">
+      <div style="font-size:.875rem;font-weight:700;color:var(--red);margin-bottom:.35rem;">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>High Priority Gaps (Mastery < 45% - Beginner Level)
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.25rem;">
+        {% for gap in high_priority_gaps %}
+        <div style="font-size:.8rem;color:var(--text-secondary);display:flex;justify-content:space-between;align-items:center;">
+          <span><strong>{{ gap.name }}</strong> ({{ gap.mastery }}%): {{ gap.action }}</span>
+          <a href="{% url 'assessments' %}" class="btn-outline-pro btn-sm" style="font-size:.7rem;padding:.15rem .5rem;">Assess</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if moderate_gaps %}
+    <div style="padding:.75rem 1rem;background:var(--yellow-bg);border-radius:var(--r-md);border-left:3px solid var(--yellow);">
+      <div style="font-size:.875rem;font-weight:700;color:var(--yellow);margin-bottom:.35rem;">
+        <i class="bi bi-info-circle-fill me-1"></i>Target Improvement Areas (45% - 74% - Normal Level)
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.25rem;">
+        {% for gap in moderate_gaps %}
+        <div style="font-size:.8rem;color:var(--text-secondary);display:flex;justify-content:space-between;align-items:center;">
+          <span><strong>{{ gap.name }}</strong> ({{ gap.mastery }}%): {{ gap.action }}</span>
+          <a href="{% url 'assessments' %}" class="btn-outline-pro btn-sm" style="font-size:.7rem;padding:.15rem .5rem;">Retake</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if mastered_skills %}
+    <div style="padding:.75rem 1rem;background:rgba(74,222,128,0.1);border-radius:var(--r-md);border-left:3px solid var(--green);">
+      <div style="font-size:.875rem;font-weight:700;color:var(--green);margin-bottom:.35rem;">
+        <i class="bi bi-check-circle-fill me-1"></i>Verified Strengths (>= 75% - Advanced Level)
+      </div>
+      <div style="font-size:.8rem;color:var(--text-secondary);">
+        {% for s in mastered_skills %}
+          <span class="pill pill-green me-1 mb-1">{{ s.name }} ({{ s.mastery }}%)</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if not high_priority_gaps and not moderate_gaps and not mastered_skills %}
+    <div class="empty-pro">
+      <i class="bi bi-clipboard-check"></i>
+      <p>Complete your initial assessments to compute your live skill gap analysis.</p>
+      <a href="{% url 'assessments' %}" class="btn-primary-pro btn-sm">Take Assessments</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="display:flex;gap:.5rem;margin-top:1.25rem;">
+    <a href="{% url 'career_roadmap' %}" class="btn-primary-pro btn-sm">Explore Learning Roadmap</a>
+    <a href="{% url 'mock_interview' %}" class="btn-outline-pro btn-sm">Practice Mock Interview</a>
+  </div>
+</div>
+
+{% endwith %}
+{% endblock %}

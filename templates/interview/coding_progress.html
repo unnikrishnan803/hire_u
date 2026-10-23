@@ -1,0 +1,153 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Coding Progress — HireU{% endblock %}
+{% block sn_code %}active{% endblock %}
+{% block dash_layout_class %}no-right-rail{% endblock %}
+{% block right_sidebar %}{% endblock %}
+
+{% block dash_content %}
+<div class="section-card mb-4">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;">
+    <div>
+      <h3 style="margin-bottom:.25rem;"><i class="bi bi-code-slash text-primary me-2"></i>Coding & DSA Progress</h3>
+      <p style="color:var(--text-secondary);font-size:.875rem;margin:0;">
+        Track your algorithmic problem-solving milestones across platforms.
+      </p>
+    </div>
+    {% if prog.platform_url %}
+    <a href="{{ prog.platform_url }}" target="_blank" rel="noopener noreferrer" class="btn-outline-pro btn-sm">
+      <i class="bi bi-box-arrow-up-right me-1"></i>View Profile
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- 4 Stat Items -->
+<div class="stat-row mb-4">
+  <div class="stat-item">
+    <div class="stat-val green">{{ prog.solved_easy }}</div>
+    <div class="stat-desc">Easy Problems</div>
+    <div class="stat-change up mt-2"><i class="bi bi-check-circle-fill"></i> Fundamentals</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-val orange">{{ prog.solved_medium }}</div>
+    <div class="stat-desc">Medium Problems</div>
+    <div class="stat-change mt-2" style="color:var(--orange);"><i class="bi bi-lightning-charge-fill"></i> Core Interview Target</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-val red">{{ prog.solved_hard }}</div>
+    <div class="stat-desc">Hard Problems</div>
+    <div class="stat-change mt-2" style="color:var(--red);"><i class="bi bi-fire"></i> Advanced Algorithms</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-val blue">{{ prog.total_solved }}</div>
+    <div class="stat-desc">Total Solved</div>
+    <div class="stat-change up mt-2"><i class="bi bi-trophy-fill"></i> {{ prog.total_contests }} Contests</div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="section-card h-100">
+      <div class="section-header mb-3">
+        <span class="section-title">Update Your Stats</span>
+        <span class="pill pill-gray"><i class="bi bi-pencil-square"></i> Manual Sync</span>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-field">
+              <label>Easy Solved</label>
+              <input type="number" name="easy" class="form-input" value="{{ prog.solved_easy }}" min="0">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-field">
+              <label>Medium Solved</label>
+              <input type="number" name="medium" class="form-input" value="{{ prog.solved_medium }}" min="0">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-field">
+              <label>Hard Solved</label>
+              <input type="number" name="hard" class="form-input" value="{{ prog.solved_hard }}" min="0">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-field">
+              <label>Contests Attempted</label>
+              <input type="number" name="contests" class="form-input" value="{{ prog.total_contests }}" min="0">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-field">
+              <label>LeetCode / Codeforces Profile URL</label>
+              <input type="url" name="platform_url" class="form-input" value="{{ prog.platform_url|default:'' }}" placeholder="https://leetcode.com/yourprofile">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary-pro mt-4">
+          <i class="bi bi-cloud-arrow-up-fill me-1"></i>Save Progress
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="section-card text-center h-100 d-flex flex-column justify-content-between">
+      <div>
+        <div class="section-header mb-3">
+          <span class="section-title">Difficulty Split</span>
+          <span class="pill pill-blue">{{ prog.total_solved }} Total</span>
+        </div>
+        <div style="max-width:240px;margin:1.5rem auto;position:relative;">
+          <canvas id="difficultyChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:1.5rem;font-size:.82rem;font-weight:600;padding-top:1rem;border-top:1px solid var(--border);">
+        <span style="color:var(--green);"><i class="bi bi-circle-fill me-1" style="font-size:.6rem;"></i>Easy: {{ prog.solved_easy }}</span>
+        <span style="color:var(--orange);"><i class="bi bi-circle-fill me-1" style="font-size:.6rem;"></i>Med: {{ prog.solved_medium }}</span>
+        <span style="color:var(--red);"><i class="bi bi-circle-fill me-1" style="font-size:.6rem;"></i>Hard: {{ prog.solved_hard }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('difficultyChart').getContext('2d');
+const easy = {{ prog.solved_easy|default:0 }};
+const med = {{ prog.solved_medium|default:0 }};
+const hard = {{ prog.solved_hard|default:0 }};
+const total = easy + med + hard;
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: total > 0 ? ['Easy', 'Medium', 'Hard'] : ['No Problems Logged Yet'],
+        datasets: [{
+            data: total > 0 ? [easy, med, hard] : [1],
+            backgroundColor: total > 0 ? ['#10B981', '#F59E0B', '#EF4444'] : ['#E2E8F0'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: total > 0 }
+        },
+        cutout: '70%'
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Mock Interview — HireU{% endblock %}
+{% block sn_iv %}active{% endblock %}
+{% block nav_iv %}active{% endblock %}
+{% block dash_layout_class %}no-right-rail{% endblock %}
+{% block right_sidebar %}{% endblock %}
+
+{% block dash_content %}
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title"><i class="bi bi-person-video3 me-2" style="color:var(--primary);"></i>AI Mock Interview</span>
+    <span class="pill pill-cyan"><i class="bi bi-robot"></i>AI Powered</span>
+  </div>
+  <p style="font-size:.875rem;color:var(--text-secondary);margin-bottom:1.5rem;">
+    Choose an interview mode to begin. Each session is evaluated across 5 dimensions: Technical, Relevance, Explanation, Communication, and Completeness.
+  </p>
+  <div class="interview-modes-grid">
+    {% for mode, label in modes %}
+    <div class="interview-mode-card">
+      <div class="interview-mode-icon">
+        <i class="bi bi-{% if mode == 'HR' %}people{% elif mode == 'TECHNICAL' %}cpu{% else %}building{% endif %}"></i>
+      </div>
+      <h5 style="color:var(--text-primary);margin-bottom:.5rem;font-weight:700;">{{ label }}</h5>
+      <p style="font-size:.83rem;color:var(--text-secondary);margin-bottom:1.25rem;line-height:1.6;">
+        {% if mode == 'HR' %}Situational, behavioural and self-introduction questions.
+        {% elif mode == 'TECHNICAL' %}DSA, OOP, DBMS, and problem-solving.
+        {% else %}Company-specific scenarios and role-fit questions.
+        {% endif %}
+      </p>
+      <form method="POST" action="{% url 'start_interview' mode %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-primary-pro btn-sm w-100" style="justify-content:center;">
+          <i class="bi bi-play-fill"></i>Start {{ label }}
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if sessions %}
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Recent Sessions</span>
+    <span class="pill pill-gray">{{ sessions|length }} session{{ sessions|length|pluralize }}</span>
+  </div>
+  <table class="table-pro">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Mode</th>
+        <th>Score</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sessions %}
+      <tr>
+        <td style="color:var(--text-secondary);">{{ s.created_at|date:"M d, Y" }}</td>
+        <td><span class="pill pill-purple">{{ s.get_mode_display }}</span></td>
+        <td>
+          <span class="fw-700 {% if s.overall_score >= 70 %}text-success{% elif s.overall_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+            {{ s.overall_score }}%
+          </span>
+        </td>
+        <td>
+          {% if s.status == 'COMPLETED' %}
+            <span class="pill pill-green"><i class="bi bi-check-circle"></i>Completed</span>
+          {% else %}
+            <span class="pill pill-orange"><i class="bi bi-clock"></i>In Progress</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if s.status == 'COMPLETED' %}
+            <a href="{% url 'interview_result' s.id %}" class="btn-outline-pro btn-sm">View Result</a>
+          {% else %}
+            <a href="{% url 'interview_question' s.id %}" class="btn-primary-pro btn-sm">Continue</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

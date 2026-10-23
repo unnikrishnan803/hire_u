@@ -1,0 +1,81 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Personalized Learning Roadmap — HireU{% endblock %}
+{% block sn_roadmap %}active{% endblock %}
+
+{% block dash_content %}
+<div class="section-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <span class="pill pill-blue mb-2">Rule-Based Adaptive Roadmap</span>
+      <h3 style="margin-bottom:.25rem;margin-top:.4rem;">Personalized Career Preparation Roadmap</h3>
+      <p style="color:var(--text-secondary);font-size:.875rem;margin:0;">
+        Target Goal: <strong>{{ target_goal }}</strong> · Milestones automatically update as you complete assessments and daily tasks.
+      </p>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:2.2rem;font-weight:800;color:var(--primary);line-height:1;">{{ profile.overall_readiness }}%</div>
+      <div style="font-size:.75rem;color:var(--text-muted);">Overall Readiness</div>
+    </div>
+  </div>
+</div>
+
+<!-- Roadmap Phases Timeline -->
+<div style="display:flex;flex-direction:column;gap:1.25rem;margin-top:1rem;">
+  {% for phase in phases %}
+  <div class="section-card" style="border-left:4px solid {% if phase.status == 'COMPLETED' %}var(--green){% elif phase.status == 'IN_PROGRESS' %}var(--primary){% else %}var(--border){% endif %};">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:.75rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <div style="width:36px;height:36px;border-radius:50%;background:{% if phase.status == 'COMPLETED' %}#dcfce7;color:var(--green){% elif phase.status == 'IN_PROGRESS' %}var(--primary-light);color:var(--primary){% else %}var(--bg-subtle);color:var(--text-muted){% endif %};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">
+          {% if phase.status == 'COMPLETED' %}<i class="bi bi-check-lg"></i>{% else %}{{ phase.number }}{% endif %}
+        </div>
+        <div>
+          <h5 style="margin-bottom:.1rem;font-weight:700;">Phase {{ phase.number }}: {{ phase.title }}</h5>
+          <div style="font-size:.8rem;color:var(--text-secondary);">{{ phase.desc }}</div>
+        </div>
+      </div>
+      <div>
+        {% if phase.status == 'COMPLETED' %}
+          <span class="pill pill-green"><i class="bi bi-check-circle-fill me-1"></i>Completed</span>
+        {% elif phase.status == 'IN_PROGRESS' %}
+          <span class="pill pill-blue"><i class="bi bi-hourglass-split me-1"></i>In Progress ({{ phase.score }}%)</span>
+        {% else %}
+          <span class="pill pill-gray"><i class="bi bi-lock me-1"></i>Upcoming</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Milestones -->
+    <div style="background:var(--bg-subtle);border-radius:var(--r-md);padding:.85rem 1rem;margin-top:.75rem;">
+      <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:.5rem;">Key Milestones</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;">
+        {% for m in phase.milestones %}
+        <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem;">
+          {% if m.done %}
+            <i class="bi bi-check-circle-fill text-success" style="font-size:.95rem;"></i>
+            <span style="color:var(--text-primary);text-decoration:line-through;opacity:0.8;">{{ m.title }}</span>
+          {% else %}
+            <i class="bi bi-circle text-muted" style="font-size:.95rem;"></i>
+            <span style="color:var(--text-secondary);">{{ m.title }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Recommended Action Callout -->
+<div class="section-card mt-3" style="background:linear-gradient(135deg, rgba(37,99,235,0.06), rgba(59,130,246,0.02));">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h5 style="margin-bottom:.25rem;font-weight:700;">Accelerate Your Roadmap Progress</h5>
+      <p style="font-size:.85rem;color:var(--text-secondary);margin:0;">Take targeted assessments and solve your daily adaptive tasks to level up each milestone.</p>
+    </div>
+    <div style="display:flex;gap:.5rem;">
+      <a href="{% url 'assessments' %}" class="btn-primary-pro"><i class="bi bi-clipboard-data me-1"></i>Assessments</a>
+      <a href="{% url 'dashboard' %}" class="btn-outline-pro"><i class="bi bi-calendar-check me-1"></i>Daily Tasks</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

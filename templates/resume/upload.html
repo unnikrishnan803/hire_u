@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Resume Checker — HireU{% endblock %}
+
+{% block content %}
+<div style="background:var(--bg-app);min-height:calc(100vh - 120px);padding:4rem 1.5rem;">
+  <div style="max-width:760px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:2.5rem;">
+      <span class="pill pill-cyan mb-2"><i class="bi bi-robot"></i> AI Powered ATS Analyzer</span>
+      <h1 style="font-size:clamp(1.8rem, 3.5vw, 2.4rem);font-weight:800;color:var(--text-primary);margin-top:.5rem;margin-bottom:.75rem;letter-spacing:-0.02em;">
+        AI Resume Checker & ATS Optimizer
+      </h1>
+      <p style="font-size:1.02rem;color:var(--text-secondary);max-width:580px;margin:0 auto;line-height:1.6;">
+        Upload your PDF resume to receive an instant ATS score, identify missing domain keywords, and get pinpoint suggestions tailored to your career goal.
+      </p>
+    </div>
+
+    <div class="card-pro p-4 p-md-5" style="box-shadow:var(--s-card-hover);">
+      <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+        <div style="border:2px dashed var(--border-glow);border-radius:var(--r-xl);padding:3rem 1.5rem;text-align:center;background:var(--primary-light);margin-bottom:2rem;cursor:pointer;position:relative;transition:all var(--t);"
+             id="dropZone">
+          <div style="width:64px;height:64px;border-radius:50%;background:#FFFFFF;color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.25rem;box-shadow:var(--s-sm);">
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+          </div>
+          <h4 style="font-weight:700;font-size:1.15rem;color:var(--text-primary);margin-bottom:.4rem;">
+            Upload your PDF Resume
+          </h4>
+          <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1.25rem;">
+            Drag & drop here or click to browse (Max 5MB)
+          </p>
+          <input type="file" name="resume_file" accept=".pdf" id="resumeFile" required
+                 style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div id="fileSelected" style="display:none;font-size:.85rem;font-weight:600;color:var(--primary);background:#FFFFFF;padding:.4rem 1rem;border-radius:var(--r-sm);box-shadow:var(--s-xs);margin-top:.5rem;display:inline-block;"></div>
+        </div>
+
+        <button type="submit" class="btn-primary-pro btn-lg w-100" id="analyzeBtn" style="justify-content:center;">
+          <i class="bi bi-magic me-1"></i>Analyze Resume Now
+        </button>
+      </form>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="mt-4 text-center d-none" style="padding:2rem 1rem;">
+        <div class="spinner-border text-primary mb-3" style="width:3rem;height:3rem;" role="status">
+          <span class="visually-hidden">Analyzing...</span>
+        </div>
+        <h5 style="color:var(--text-primary);font-weight:700;margin-bottom:.4rem;">Extracting content and running AI rubric analysis...</h5>
+        <p style="color:var(--text-secondary);font-size:.85rem;margin:0;">Evaluating keywords, ATS formatting compatibility, and skill matches.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:1.75rem;font-size:.82rem;color:var(--text-muted);text-align:center;">
+      <i class="bi bi-shield-check text-success"></i>
+      <span>Your documents are processed securely and never shared with third parties.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('resumeFile');
+  const fileLabel = document.getElementById('fileSelected');
+  fileInput.addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+      fileLabel.textContent = 'Selected: ' + this.files[0].name;
+      fileLabel.style.display = 'inline-block';
+    }
+  });
+
+  document.getElementById('uploadForm').addEventListener('submit', function() {
+    document.getElementById('analyzeBtn').classList.add('d-none');
+    document.getElementById('loadingState').classList.remove('d-none');
+  });
+</script>
+{% endblock %}

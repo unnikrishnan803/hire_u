@@ -1,0 +1,148 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Interview Result — HireU{% endblock %}
+
+{% block sn_iv %}active{% endblock %}
+{% block nav_iv %}active{% endblock %}
+{% block dash_layout_class %}no-right-rail{% endblock %}
+{% block right_sidebar %}{% endblock %}
+
+{% block dash_content %}
+<div class="section-card text-center py-4 mb-4">
+  <div style="max-width:580px;margin:0 auto;">
+    <span class="pill pill-purple mb-2" style="font-size:.85rem;padding:.3rem .85rem;">
+      <i class="bi bi-robot"></i> {{ session.get_mode_display }} Evaluation
+    </span>
+    <h2 style="margin-bottom:.3rem;margin-top:.5rem;">Interview Performance</h2>
+    <p style="color:var(--text-secondary);font-size:.875rem;">Completed on {{ session.created_at|date:"F d, Y · H:i" }}</p>
+
+    <!-- Score Highlight Card -->
+    <div style="background:var(--primary-light);border-radius:var(--r-xl);padding:2rem 1.5rem;margin:1.75rem 0;box-shadow:var(--s-card);">
+      <div style="font-size:3.5rem;font-weight:800;color:var(--primary);line-height:1;letter-spacing:-0.03em;">
+        {{ pct }}<span style="font-size:2rem;font-weight:700;">%</span>
+      </div>
+      <div style="font-size:1rem;font-weight:700;margin-top:.6rem;color:var(--text-primary);">
+        {% if pct >= 70 %}
+          <span style="color:var(--green);"><i class="bi bi-check-circle-fill me-1"></i>Strong Candidate Ready</span>
+        {% elif pct >= 50 %}
+          <span style="color:var(--orange);"><i class="bi bi-dash-circle-fill me-1"></i>Moderate Readiness · Focus on Feedback</span>
+        {% else %}
+          <span style="color:var(--red);"><i class="bi bi-exclamation-circle-fill me-1"></i>Needs Structured Practice</span>
+        {% endif %}
+      </div>
+      <div class="prog-bar mt-3" style="height:10px;max-width:320px;margin-left:auto;margin-right:auto;">
+        <div class="fill {% if pct >= 70 %}green{% elif pct >= 50 %}orange{% else %}red{% endif %}"
+             data-pct="{{ pct }}" style="width:{{ pct }}%;"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;">
+      <a href="{% url 'mock_interview' %}" class="btn-outline-pro">
+        <i class="bi bi-arrow-left me-1"></i>Try Another Mode
+      </a>
+      <a href="{% url 'dashboard' %}" class="btn-primary-pro">
+        <i class="bi bi-speedometer2 me-1"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Strengths & Weaknesses Grid -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="section-card h-100" style="border-left:4px solid var(--green);">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;">
+        <span class="pill pill-green"><i class="bi bi-check-circle-fill"></i>Strengths</span>
+      </div>
+      <p style="font-size:.875rem;color:var(--text-secondary);line-height:1.7;margin:0;">
+        {{ session.strengths|default:"Good clarity and attempt across foundational topics." }}
+      </p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="section-card h-100" style="border-left:4px solid var(--red);">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;">
+        <span class="pill pill-red"><i class="bi bi-exclamation-triangle-fill"></i>Areas for Improvement</span>
+      </div>
+      <p style="font-size:.875rem;color:var(--text-secondary);line-height:1.7;margin:0;">
+        {{ session.weaknesses|default:"Work on concise problem breakdown and structured STAR answers." }}
+      </p>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="section-card" style="border-left:4px solid var(--orange);background:var(--orange-bg);">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;">
+        <span class="pill pill-yellow"><i class="bi bi-lightbulb-fill"></i>AI Recommendations</span>
+      </div>
+      <p style="font-size:.875rem;color:var(--orange-text);line-height:1.7;margin:0;">
+        {{ session.recommendations|default:"Review the targeted modules in your learning roadmap and practice technical mock questions." }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Answer Breakdown Section -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title"><i class="bi bi-chat-square-text text-primary me-2"></i>Detailed Question Breakdown</span>
+    <span class="pill pill-gray">{{ answers|length }} Question{{ answers|length|pluralize }} Evaluated</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:1.25rem;margin-top:1rem;">
+    {% for ans in answers %}
+    <div class="section-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem;">
+        <span class="pill pill-blue" style="font-size:.75rem;font-weight:700;">Question {{ forloop.counter }}</span>
+        <span style="font-size:.8rem;color:var(--text-muted);">{{ ans.question.question_text|truncatewords:6 }}</span>
+      </div>
+
+      <h5 style="font-weight:700;font-size:.95rem;color:var(--text-primary);margin-bottom:.85rem;line-height:1.5;">
+        {{ ans.question.question_text }}
+      </h5>
+
+      <div style="background:var(--bg-app);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;margin-bottom:1rem;">
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:.35rem;">
+          Your Answer:
+        </div>
+        <p style="font-size:.875rem;color:var(--text-secondary);margin:0;line-height:1.6;white-space:pre-wrap;">{{ ans.student_answer }}</p>
+      </div>
+
+      <!-- 4 Rubric Scores -->
+      <div class="row g-2 mb-3">
+        {% with scores=ans %}
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:.75rem;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:var(--primary);">{{ scores.score_technical }}/40</div>
+            <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-top:.2rem;">Technical</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:.75rem;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:var(--accent);">{{ scores.score_relevance }}/20</div>
+            <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-top:.2rem;">Relevance</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:.75rem;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:var(--purple);">{{ scores.score_explanation }}/20</div>
+            <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-top:.2rem;">Explanation</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:.75rem;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:var(--green);">{{ scores.score_communication }}/10</div>
+            <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-top:.2rem;">Communication</div>
+          </div>
+        </div>
+        {% endwith %}
+      </div>
+
+      {% if ans.feedback %}
+      <div style="background:var(--primary-light);border-left:3px solid var(--primary);border-radius:var(--r-sm);padding:.85rem 1rem;font-size:.85rem;color:var(--primary-dark);">
+        <i class="bi bi-robot me-1"></i> <strong>AI Feedback:</strong> {{ ans.feedback }}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

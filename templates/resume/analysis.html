@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume ATS Analysis — HireU{% endblock %}
+
+{% block content %}
+<div style="background:var(--bg-app);min-height:calc(100vh - 120px);padding:3.5rem 1.5rem;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem;">
+          <span class="pill pill-cyan"><i class="bi bi-robot"></i> ATS Analysis Report</span>
+        </div>
+        <h2 style="font-weight:800;letter-spacing:-0.02em;color:var(--text-primary);margin:0;">
+          Resume Feedback & Match Score
+        </h2>
+      </div>
+      <div style="display:flex;gap:.75rem;">
+        <a href="{% url 'upload_resume' %}" class="btn-outline-pro btn-sm">
+          <i class="bi bi-arrow-repeat me-1"></i>Upload Another
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn-primary-pro btn-sm">
+          <i class="bi bi-speedometer2 me-1"></i>Go to Dashboard
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- ATS Score Card -->
+      <div class="col-lg-4">
+        <div class="card-pro p-4 text-center h-100 d-flex flex-column justify-content-center">
+          <span class="pill pill-blue mx-auto mb-3" style="font-size:.78rem;font-weight:700;">ATS Compatibility</span>
+
+          <div style="margin:1rem auto 1.5rem;position:relative;width:150px;height:150px;">
+            <div class="rounded-circle d-flex align-items-center justify-content-center w-100 h-100" 
+                 style="background: conic-gradient({% if analysis.ats_score >= 80 %}var(--green){% elif analysis.ats_score >= 60 %}var(--orange){% else %}var(--red){% endif %} {{ analysis.ats_score }}%, #E2E8F0 0deg);box-shadow:var(--s-card);">
+              <div class="rounded-circle bg-white d-flex flex-column align-items-center justify-content-center" style="width: 122px; height: 122px;">
+                <span style="font-size:2.8rem;font-weight:800;line-height:1;color:var(--text-primary);">{{ analysis.ats_score }}</span>
+                <span style="font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Out of 100</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            {% if analysis.ats_score >= 80 %}
+              <span class="pill pill-green" style="font-size:.85rem;padding:.35rem .9rem;"><i class="bi bi-check-circle-fill"></i> Strong Match</span>
+            {% elif analysis.ats_score >= 60 %}
+              <span class="pill pill-yellow" style="font-size:.85rem;padding:.35rem .9rem;"><i class="bi bi-dash-circle-fill"></i> Moderate Alignment</span>
+            {% else %}
+              <span class="pill pill-red" style="font-size:.85rem;padding:.35rem .9rem;"><i class="bi bi-exclamation-triangle-fill"></i> Needs Optimization</span>
+            {% endif %}
+          </div>
+
+          <p style="font-size:.85rem;color:var(--text-secondary);margin:0;line-height:1.5;">
+            Evaluated against: <strong style="color:var(--text-primary);">{{ request.user.student_profile.career_goal|default:"Placement Standards" }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- AI Feedback Card -->
+      <div class="col-lg-8">
+        <div class="card-pro p-4 p-md-5 h-100">
+          <div class="section-header mb-4">
+            <span class="section-title"><i class="bi bi-magic text-primary me-2"></i>Detailed Recommendations</span>
+          </div>
+
+          <!-- Missing Keywords -->
+          <div class="mb-4 p-3" style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r-md);">
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+              <span class="pill pill-red" style="font-size:.75rem;"><i class="bi bi-exclamation-circle-fill"></i> Missing Keywords</span>
+            </div>
+            <p style="font-size:.875rem;color:var(--red-text);margin:0;line-height:1.6;">
+              {% if analysis.missing_keywords %}
+                {{ analysis.missing_keywords }}
+              {% else %}
+                <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Great job! Key industry terms are present in your resume.</span>
+              {% endif %}
+            </p>
+          </div>
+
+          <!-- Skill Gaps -->
+          <div class="mb-4 p-3" style="background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:var(--r-md);">
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+              <span class="pill pill-yellow" style="font-size:.75rem;"><i class="bi bi-arrow-up-right-circle-fill"></i> Skill Gaps Identified</span>
+            </div>
+            <p style="font-size:.875rem;color:var(--orange-text);margin:0;line-height:1.6;">
+              {{ analysis.skill_gaps|default:"No critical skill gaps identified." }}
+            </p>
+          </div>
+
+          <!-- Content Suggestions -->
+          <div class="p-3" style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r-md);">
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+              <span class="pill pill-green" style="font-size:.75rem;"><i class="bi bi-lightbulb-fill"></i> Actionable Content Suggestions</span>
+            </div>
+            <p style="font-size:.875rem;color:var(--green-text);margin:0;line-height:1.6;">
+              {{ analysis.suggestions|default:"Include quantifiable metrics (e.g., % improvement, users impacted) under each project." }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extracted Text preview -->
+      <div class="col-12">
+        <div class="card-pro p-4">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;">
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <span class="section-title"><i class="bi bi-file-earmark-text text-primary me-2"></i>Extracted Resume Text Preview</span>
+            </div>
+            <button class="btn-outline-pro btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#extractedText">
+              <i class="bi bi-chevron-expand me-1"></i>Toggle View
+            </button>
+          </div>
+          <div class="collapse" id="extractedText">
+            <pre style="background:var(--bg-app);border:1px solid var(--border);border-radius:var(--r-md);padding:1.25rem;font-size:0.82rem;line-height:1.6;color:var(--text-secondary);max-height:320px;overflow-y:auto;white-space:pre-wrap;margin-top:.75rem;font-family:'JetBrains Mono',monospace;">{{ resume.extracted_text }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

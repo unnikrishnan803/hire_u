@@ -1,0 +1,73 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Assessments — HireU{% endblock %}
+{% block sn_assess %}active{% endblock %}
+{% block nav_assess %}active{% endblock %}
+
+{% block dash_content %}
+<div class="section-card mb-1">
+  <h3 style="margin-bottom:.3rem;">Initial Assessments</h3>
+  <p style="color:var(--text-secondary);font-size:.875rem;margin:0;">
+    Complete the 3-part assessment to unlock your personalised Skill Passport and daily adaptive training plan.
+  </p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.75rem;">
+  {% for assessment in assessments %}
+  <div class="opp-card">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+      <div style="width:48px;height:48px;border-radius:var(--r-md);background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">
+        <i class="bi bi-{% if assessment.type == 'APTITUDE' %}calculator{% elif assessment.type == 'TECHNICAL' %}cpu{% else %}mic{% endif %}"></i>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;">{{ assessment.title }}</div>
+        <span class="pill pill-blue" style="font-size:.65rem;">{{ assessment.get_type_display }}</span>
+      </div>
+    </div>
+    <p style="font-size:.83rem;color:var(--text-secondary);margin-bottom:1rem;">
+      {% if assessment.type == 'APTITUDE' %}
+        Quantitative, Logical Reasoning, Verbal Ability, Data Interpretation.
+      {% elif assessment.type == 'TECHNICAL' %}
+        Programming, DSA, Algorithms, DBMS & SQL — tailored to your department.
+      {% else %}
+        Grammar, Vocabulary, Self Introduction, HR & Situational Questions.
+      {% endif %}
+    </p>
+    {% if assessment.id in completed_ids %}
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span class="pill pill-green"><i class="bi bi-check-circle-fill"></i>Completed</span>
+        <a href="{% url 'take_assessment' assessment.id %}" class="btn-outline-pro btn-sm" style="font-size:.78rem;">Retake</a>
+      </div>
+    {% else %}
+      <a href="{% url 'take_assessment' assessment.id %}" class="btn-primary-pro w-100" style="justify-content:center;">Start Assessment</a>
+    {% endif %}
+  </div>
+  {% empty %}
+    <div class="empty-pro"><i class="bi bi-clipboard-x"></i><p>No assessments available.</p></div>
+  {% endfor %}
+</div>
+
+{% if attempts %}
+<div class="section-card mt-3">
+  <div class="section-header">
+    <span class="section-title">Past Attempts</span>
+  </div>
+  <table class="table-pro">
+    <thead>
+      <tr><th>Assessment</th><th>Score</th><th>Percentage</th><th>Level</th><th>Date</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in attempts %}
+      <tr>
+        <td style="font-weight:600;">{{ item.attempt.assessment.title }}</td>
+        <td>{{ item.attempt.score }}/{{ item.attempt.max_score }}</td>
+        <td><strong>{{ item.percentage }}%</strong></td>
+        <td><span class="pill {{ item.level_class }}">{{ item.level }}</span></td>
+        <td style="color:var(--text-muted);">{{ item.attempt.completed_at|date:"M d, Y H:i" }}</td>
+        <td><a href="{% url 'assessment_result' item.attempt.id %}" class="btn-outline-pro btn-sm" style="font-size:.75rem;">View Result</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Profile — HireU</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}?v=clean_ui_v5" rel="stylesheet">
+</head>
+<body>
+<div class="onboard-layout">
+  <div class="onboard-card">
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:2rem;">
+      <img src="{% static 'images/logo_new.png' %}" alt="HireU" style="height:36px;width:auto;margin:0 auto .75rem;object-fit:contain;display:block;">
+      <h3 style="color:var(--text-primary);margin-bottom:.35rem;">Complete Your Profile</h3>
+      <p style="font-size:.85rem;color:var(--text-muted);margin:0;">Takes less than 2 minutes · No payment required</p>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="wizard-bar">
+      <div class="wizard-step active" id="bar-1"></div>
+      <div class="wizard-step"        id="bar-2"></div>
+      <div class="wizard-step"        id="bar-3"></div>
+      <div class="wizard-step"        id="bar-4"></div>
+    </div>
+
+    <form method="POST" id="onboardingForm">
+      {% csrf_token %}
+
+      <!-- Step 1: Department -->
+      <div class="step-content active" id="step-1">
+        <div class="wizard-header">
+          <div class="wizard-step-num">1</div>
+          <div>
+            <h4>Select Your Department</h4>
+            <p>This helps us tailor your skill assessments and training plan.</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          {% for dept in departments %}
+          <label class="dept-card" id="dept-label-{{ dept.id }}">
+            <input type="radio" name="department" value="{{ dept.id }}" required>
+            <div class="dept-card-icon"><i class="bi bi-mortarboard"></i></div>
+            <div>
+              <div class="dept-card-label">{{ dept.name }}</div>
+              <div class="dept-card-sub">{{ dept.code }}</div>
+            </div>
+          </label>
+          {% empty %}
+          <div class="alert alert-warning">No departments configured yet.</div>
+          {% endfor %}
+        </div>
+        <div class="wizard-nav">
+          <span></span>
+          <button type="button" class="btn-primary-pro next-step">Next <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 2: Academics -->
+      <div class="step-content" id="step-2">
+        <div class="wizard-header">
+          <div class="wizard-step-num">2</div>
+          <div>
+            <h4>Academic Information</h4>
+            <p>Used to set difficulty level and match opportunities.</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;">
+          <div class="form-field">
+            <label>Current Year</label>
+            <select name="year" class="form-input" required>
+              <option value="">Select Year</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>CGPA</label>
+            <input type="number" step="0.01" max="10" min="0" name="cgpa" class="form-input" placeholder="e.g. 8.5" required>
+          </div>
+          <div class="form-field">
+            <label>Backlogs</label>
+            <input type="number" min="0" name="backlogs" class="form-input" value="0" required>
+          </div>
+        </div>
+        <div class="wizard-nav">
+          <button type="button" class="btn-outline-pro prev-step"><i class="bi bi-arrow-left"></i> Back</button>
+          <button type="button" class="btn-primary-pro next-step">Next <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 3: Career Goal -->
+      <div class="step-content" id="step-3">
+        <div class="wizard-header">
+          <div class="wizard-step-num">3</div>
+          <div>
+            <h4>Career Goal &amp; Track</h4>
+            <p>Define what you are aiming for to get the right training.</p>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Primary Career Goal</label>
+          <input type="text" name="career_goal" class="form-input" placeholder="e.g., Software Developer, Data Analyst" required>
+        </div>
+        <div class="form-field">
+          <label>Career Track</label>
+          <select name="career_track" class="form-input" required>
+            <option value="">Select a track...</option>
+            {% for track in tracks %}
+            <option value="{{ track.id }}">{{ track.name }} ({{ track.department.code }})</option>
+            {% endfor %}
+          </select>
+          <div style="font-size:.76rem;color:var(--text-muted);margin-top:.4rem;">Career tracks define your assessment topics and daily training content.</div>
+        </div>
+        <div class="wizard-nav">
+          <button type="button" class="btn-outline-pro prev-step"><i class="bi bi-arrow-left"></i> Back</button>
+          <button type="button" class="btn-primary-pro next-step">Next <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 4: Target Companies -->
+      <div class="step-content" id="step-4">
+        <div class="wizard-header">
+          <div class="wizard-step-num">4</div>
+          <div>
+            <h4>Target Companies</h4>
+            <p>Select up to 5 companies you are aiming for.</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;">
+          {% for company in companies %}
+          <label class="company-card" id="co-label-{{ company.id }}">
+            <input type="checkbox" name="companies" value="{{ company.id }}" class="company-checkbox">
+            <div class="dept-card-icon"><i class="bi bi-building"></i></div>
+            <div class="dept-card-label">{{ company.name }}</div>
+          </label>
+          {% empty %}
+          <div class="alert alert-info">No companies in database yet.</div>
+          {% endfor %}
+        </div>
+        <div class="wizard-nav">
+          <button type="button" class="btn-outline-pro prev-step"><i class="bi bi-arrow-left"></i> Back</button>
+          <button type="submit" class="btn-primary-pro"><i class="bi bi-check-circle-fill"></i> Complete Setup</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  function showStep(step) {
+    document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+    document.getElementById('step-' + step).classList.add('active');
+    for (let i = 1; i <= totalSteps; i++) {
+      const bar = document.getElementById('bar-' + i);
+      bar.classList.remove('active', 'done');
+      if (i < step) bar.classList.add('done');
+      else if (i === step) bar.classList.add('active');
+    }
+  }
+
+  document.querySelectorAll('.next-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const current = document.getElementById('step-' + currentStep);
+      const inputs = current.querySelectorAll('input[required], select[required]');
+      let valid = true;
+      inputs.forEach(input => { if (!input.value) { valid = false; input.focus(); } });
+      if (valid && currentStep < totalSteps) { currentStep++; showStep(currentStep); }
+      else if (!valid) { /* native HTML5 handles it */ }
+    });
+  });
+
+  document.querySelectorAll('.prev-step').forEach(btn => {
+    btn.addEventListener('click', () => { if (currentStep > 1) { currentStep--; showStep(currentStep); } });
+  });
+
+  // Radio dept card
+  document.querySelectorAll('input[name="department"]').forEach(input => {
+    input.addEventListener('change', function() {
+      document.querySelectorAll('.dept-card').forEach(c => c.classList.remove('selected'));
+      this.closest('.dept-card').classList.add('selected');
+    });
+  });
+
+  // Checkbox company card (max 5)
+  document.querySelectorAll('.company-checkbox').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const checked = document.querySelectorAll('.company-checkbox:checked').length;
+      if (checked > 5) { this.checked = false; return; }
+      this.closest('.company-card').classList.toggle('selected', this.checked);
+    });
+  });
+</script>
+</body>
+</html>
