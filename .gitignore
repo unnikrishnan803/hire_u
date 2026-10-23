@@ -27,5 +27,6 @@ desktop.ini
 *.sln
 *.sw?
 
-# Logs
+# Logs & Zips
 *.log
+*.zip
